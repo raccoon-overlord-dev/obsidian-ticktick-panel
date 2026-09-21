@@ -1,0 +1,19 @@
+{
+	"name": "obsidian-ticktick-panel",
+	"version": "0.1.0",
+	"description": "Obsidian desktop plugin that embeds the TickTick web app in a webview.",
+	"main": "main.js",
+	"type": "module",
+	"scripts": {
+		"dev": "node esbuild.config.mjs",
+		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production"
+	},
+	"keywords": [],
+	"license": "MIT",
+	"devDependencies": {
+		"@types/node": "^22.15.17",
+		"esbuild": "0.25.5",
+		"obsidian": "latest",
+		"typescript": "^5.8.3"
+	}
+}

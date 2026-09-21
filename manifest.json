@@ -1,0 +1,9 @@
+{
+	"id": "ticktick-panel",
+	"name": "TickTick Panel",
+	"version": "0.1.0",
+	"minAppVersion": "1.0.0",
+	"description": "Embed the TickTick web app in an Obsidian tab or sidebar.",
+	"author": "raccoon-overlord-dev",
+	"isDesktopOnly": true
+}

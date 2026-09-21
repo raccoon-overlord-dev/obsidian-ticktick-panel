@@ -1,0 +1,8 @@
+.workspace-leaf-content[data-type="ticktick-view"] .view-content {
+	padding: 0;
+}
+
+.workspace-leaf-content[data-type="ticktick-view"] webview {
+	width: 100%;
+	height: 100%;
+}
