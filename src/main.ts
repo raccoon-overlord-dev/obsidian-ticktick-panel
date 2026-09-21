@@ -4,8 +4,14 @@ const VIEW_TYPE = 'ticktick-view';
 const PARTITION = 'persist:ticktick';
 const SIGNIN_URL = 'https://ticktick.com/signin';
 
+interface ElectronSession {
+	cookies: { get(filter: { url: string; name: string }): Promise<unknown[]> };
+	clearStorageData(): Promise<void>;
+}
+
 // remote is Electron-internal and untyped here; absent on some Obsidian builds.
-const session = () => require('electron').remote.session.fromPartition(PARTITION);
+const session = () =>
+	(window.require('electron') as { remote: { session: { fromPartition(p: string): ElectronSession } } }).remote.session.fromPartition(PARTITION);
 
 const icon = () => (getIcon('list-checks') ? 'list-checks' : 'check-circle');
 
@@ -25,6 +31,7 @@ class TickTickView extends ItemView {
 	async onOpen() {
 		// 'webview' is not in HTMLElementTagNameMap; the cast only satisfies createEl's typing.
 		this.contentEl.createEl('webview' as 'div', {
+			cls: 'ticktick-webview',
 			attr: {
 				src: 'https://ticktick.com/webapp/',
 				partition: PARTITION,
@@ -116,23 +123,42 @@ class TickTickSettingTab extends PluginSettingTab {
 		super(app, plugin);
 	}
 
-	async display() {
+	// Obsidian 1.13+: declarative definition, so the setting shows up in settings search.
+	getSettingDefinitions() {
+		return [
+			{
+				name: 'Account management',
+				desc: 'Log in to or out of TickTick.',
+				aliases: ['login', 'logout', 'sign in', 'sign out', 'account'],
+				render: (setting: Setting) => this.renderAccount(setting),
+			},
+		];
+	}
+
+	// Fallback for Obsidian before 1.13, which ignores getSettingDefinitions().
+	display() {
 		this.containerEl.empty();
-		const loggedIn = await this.plugin.isLoggedIn();
-		new Setting(this.containerEl)
-			.setName('Account management')
-			.setDesc(loggedIn ? 'Logged in to TickTick.' : 'Not logged in to TickTick.')
-			.addButton((b) =>
-				loggedIn
-					? b.setButtonText('Logout').setWarning().onClick(async () => {
-							await this.plugin.logout();
-							await this.display();
-						})
-					: b.setButtonText('Login').setCta().onClick(() => {
-							// Close the settings modal so the new tab is visible.
-							(this.app as App & { setting?: { close(): void } }).setting?.close();
-							return this.plugin.login();
-						}),
-			);
+		this.renderAccount(new Setting(this.containerEl));
+	}
+
+	private renderAccount(setting: Setting) {
+		setting.setName('Account management');
+		void this.plugin.isLoggedIn().then((loggedIn) => {
+			setting.controlEl.empty();
+			setting
+				.setDesc(loggedIn ? 'Logged in to TickTick.' : 'Not logged in to TickTick.')
+				.addButton((b) =>
+					loggedIn
+						? b.setButtonText('Logout').setWarning().onClick(async () => {
+								await this.plugin.logout();
+								this.renderAccount(setting);
+							})
+						: b.setButtonText('Login').setCta().onClick(() => {
+								// Close the settings modal so the new tab is visible.
+								(this.app as App & { setting?: { close(): void } }).setting?.close();
+								return this.plugin.login();
+							}),
+				);
+		});
 	}
 }

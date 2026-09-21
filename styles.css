@@ -2,7 +2,7 @@
 	padding: 0;
 }
 
-.workspace-leaf-content[data-type="ticktick-view"] webview {
+.workspace-leaf-content[data-type="ticktick-view"] .ticktick-webview {
 	width: 100%;
 	height: 100%;
 }

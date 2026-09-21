@@ -1,4 +1,4 @@
-# TickTick for Obsidian
+# TickTick Panel
 
 Embeds the [TickTick](https://ticktick.com/) web app inside Obsidian, in a tab or in the right sidebar, so you have one less app to keep open.
 
@@ -6,7 +6,7 @@ It is a thin wrapper around a webview of `https://ticktick.com/webapp/`. It does
 
 **How it differs from other TickTick plugins:** those talk to the TickTick API to sync tasks into your notes. This one does none of that. It shows the full TickTick web app in a panel, so you get TickTick's own interface and every feature it has, with no API tokens or setup.
 
-**Desktop only.** The plugin uses Electron's `<webview>` tag, which does not exist on Obsidian mobile.
+**Desktop only.** The plugin uses Electron's `<webview>` tag, which does not exist on Obsidian mobile. Requires Obsidian 1.7.2 or newer.
 
 ## Usage
 
