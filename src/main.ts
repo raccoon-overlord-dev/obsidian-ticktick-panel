@@ -10,8 +10,11 @@ interface ElectronSession {
 }
 
 // remote is Electron-internal and untyped here; absent on some Obsidian builds.
-const session = () =>
-	(window.require('electron') as { remote: { session: { fromPartition(p: string): ElectronSession } } }).remote.session.fromPartition(PARTITION);
+const session = () => {
+	const load = (window as unknown as { require: (id: string) => unknown }).require;
+	const electron = load('electron') as { remote: { session: { fromPartition(p: string): ElectronSession } } };
+	return electron.remote.session.fromPartition(PARTITION);
+};
 
 const icon = () => (getIcon('list-checks') ? 'list-checks' : 'check-circle');
 
@@ -147,18 +150,21 @@ class TickTickSettingTab extends PluginSettingTab {
 			setting.controlEl.empty();
 			setting
 				.setDesc(loggedIn ? 'Logged in to TickTick.' : 'Not logged in to TickTick.')
-				.addButton((b) =>
-					loggedIn
-						? b.setButtonText('Logout').setWarning().onClick(async () => {
-								await this.plugin.logout();
-								this.renderAccount(setting);
-							})
-						: b.setButtonText('Login').setCta().onClick(() => {
-								// Close the settings modal so the new tab is visible.
-								(this.app as App & { setting?: { close(): void } }).setting?.close();
-								return this.plugin.login();
-							}),
-				);
+				.addButton((b) => {
+					if (loggedIn) {
+						// Same look as the deprecated setWarning(); its replacement, setDestructive(), needs Obsidian 1.13.
+						b.buttonEl.addClass('mod-warning');
+						return b.setButtonText('Logout').onClick(async () => {
+							await this.plugin.logout();
+							this.renderAccount(setting);
+						});
+					}
+					return b.setButtonText('Login').setCta().onClick(() => {
+						// Close the settings modal so the new tab is visible.
+						(this.app as App & { setting?: { close(): void } }).setting?.close();
+						return this.plugin.login();
+					});
+				});
 		});
 	}
 }

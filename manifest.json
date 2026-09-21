@@ -1,7 +1,7 @@
 {
 	"id": "ticktick-panel",
 	"name": "TickTick Panel",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"minAppVersion": "1.7.2",
 	"description": "Embed the TickTick web app in a tab or sidebar.",
 	"author": "raccoon-overlord-dev",
